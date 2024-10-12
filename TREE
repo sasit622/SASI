@@ -1,0 +1,99 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct node{
+    int data;
+    struct node*left;
+    struct node* right;
+};
+struct node* create(int d){
+    struct node* newnode = (struct node*) malloc (sizeof(struct node));
+    newnode->data=d;
+    newnode->left=NULL;
+    newnode->right=NULL;
+    return newnode;
+};
+struct node* search(struct node* r,int target){
+    struct node* temp=r;
+    struct node* tempr= r->right;
+    struct node* templ=r->left;
+    if(temp == NULL){
+        printf("free");
+    }
+    else{
+        if(target == temp->data){
+            return temp;
+        }
+        else if(target != temp->data && tempr != NULL){
+            search(temp->right,target);
+        }
+        else if(target != temp->data && templ != NULL){
+            search(temp->left,target);
+        }
+        else {
+            return NULL;
+        }
+    }
+
+};
+struct node* insert(struct node* r,int data,int boss){
+    struct node*root=r;
+    struct node* newnode=create(data);
+    if (root == NULL){
+        root=newnode;
+    }
+    else{
+        if(root->data == boss ){
+            if (root->left==NULL){
+                root->left=newnode;
+            }
+            else {
+                root->right=newnode;
+            }
+        }
+        else{
+           struct node* temp=search(root,boss);
+           insert(temp,data,boss);
+        }
+    }
+    return root;
+}
+struct node* findLCA(struct node* root, int n1, int n2) {
+    if (root == NULL) return NULL;
+
+    if (root->data == n1 || root->data == n2)
+        return root;
+
+    struct node* leftLCA = findLCA(root->left, n1, n2);
+    struct node* rightLCA = findLCA(root->right, n1, n2);
+
+    if (leftLCA && rightLCA)
+        return root;
+
+    return (leftLCA != NULL) ? leftLCA : rightLCA;
+}
+
+int main(){
+    int n,b,q,node1,node2;
+    printf("Enter Number Of Employee And Queries:");
+    scanf("%d %d",&n,&q);
+    struct node* root;
+    root=create(1);
+    for(int i=2; i<=n;i++){
+        printf("Enter Boss of Employee %d:",i);
+        scanf("%d",&b);
+        root=insert(root,i,b);
+    }
+    for(int i=1;i<=q;i++){
+    printf("Enter the two employees to find their Lowest Common Boss: ");
+    scanf("%d %d", &node1, &node2);
+
+    // Find and print the LCA
+    struct node* lca = findLCA(root, node1, node2);
+    if (lca != NULL) {
+        printf("The lowest common boss of employees %d and %d : %d\n", node1, node2, lca->data);
+    } else {
+        printf("No common Boss found ");
+    }
+    }
+    return 0;
+}
